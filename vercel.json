@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://bsc-1.aerocloud.id:19262/api/:path*"
+    }
+  ]
+}

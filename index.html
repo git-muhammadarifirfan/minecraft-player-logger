@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlayerActionLogger Monitor - Develop by Young_Jawa</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <rect x="6" y="6" width="52" height="52" rx="8" fill="#8B5A2B"/>
+            <rect x="6" y="6" width="52" height="18" rx="8" fill="#48A23F"/>
+            <rect x="6" y="20" width="52" height="9" fill="#6DBA45"/>
+            <rect x="14" y="36" width="8" height="8" fill="#6B3F1D"/>
+            <rect x="30" y="45" width="7" height="7" fill="#6B3F1D"/>
+            <rect x="45" y="35" width="6" height="6" fill="#6B3F1D"/>
+          </svg>
+        </div>
+        <div>
+          <h1>PlayerActionLogger</h1>
+          <p>Develop by <strong>Young_Jawa</strong></p>
+        </div>
+      </div>
+
+      <div class="clock-card">
+        <span>Realtime Clock</span>
+        <strong id="live-clock">--:--:--</strong>
+        <small id="live-date">Loading...</small>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="overview" type="button">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V21h-6v-6H9v6H3z"/></svg>
+          </span>
+          <span class="nav-text">Overview<small>Aktivitas terbaru</small></span>
+        </button>
+
+        <button class="nav-item" data-view="players" type="button">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/></svg>
+          </span>
+          <span class="nav-text">Players<small>Log terakhir player</small></span>
+        </button>
+
+        <button class="nav-item" data-view="chest" type="button">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 7h18v14H3zm2 2v3h6V9zm8 0v3h6V9zM5 14v5h14v-5zm6 1h2v3h-2zM6 3h12l3 4H3z"/></svg>
+          </span>
+          <span class="nav-text">Chest<small>Item & container</small></span>
+        </button>
+
+        <button class="nav-item" data-view="blocks" type="button">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+          </span>
+          <span class="nav-text">Block Activity<small>Taruh & hancur block</small></span>
+        </button>
+
+        <button class="nav-item" data-view="search" type="button">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24"><path d="M10 4a6 6 0 1 0 3.74 10.7l4.78 4.78 1.41-1.41-4.78-4.78A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/></svg>
+          </span>
+          <span class="nav-text">Search<small>Cari semua log</small></span>
+        </button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <p class="kicker">Minecraft Activity Monitor</p>
+          <h2 id="page-title">Overview</h2>
+          <p class="subtitle">Judul tetap Minecraft style, data dibuat lebih bersih, ringan, dan gampang dibaca.</p>
+        </div>
+
+        <div class="top-actions">
+          <div id="api-status" class="status loading">Checking API</div>
+          <div class="sync-card">
+            <span>Auto refresh</span>
+            <strong>ON · 3 DETIK</strong>
+            <small id="last-sync">Last sync: -</small>
+          </div>
+          <button id="refresh-now" class="btn primary" type="button">Refresh Now</button>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span>Total Players</span>
+          <strong id="stat-players">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Visible Logs</span>
+          <strong id="stat-logs">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Chest Logs</span>
+          <strong id="stat-chest">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Block Activity</span>
+          <strong id="stat-block">0</strong>
+        </article>
+      </section>
+
+      <section id="view-overview" class="view active">
+        <div class="grid-two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Player Aktivitas Terbaru</h3>
+                <p>Selalu diurutkan dari log paling baru.</p>
+              </div>
+              <button id="copy-latest" class="btn small" type="button">Copy</button>
+            </div>
+            <div id="latest-player-list" class="latest-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Ringkasan Aktivitas</h3>
+                <p>Kategori dibuat jelas dan lebih enak dipantau.</p>
+              </div>
+            </div>
+            <div id="breakdown" class="breakdown"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Log Terbaru</h3>
+              <p>Tabel rapi untuk pantau server tanpa raw log.</p>
+            </div>
+          </div>
+          <div id="recent-table"></div>
+        </article>
+      </section>
+
+      <section id="view-players" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Players</h3>
+              <p>Klik kartu untuk detail. Modal ikut refresh otomatis saat ada log baru.</p>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input id="player-keyword" class="input" type="search" placeholder="Cari player..." />
+            <select id="player-category" class="input select">
+              <option value="all">Semua aktivitas</option>
+              <option value="take">Mengambil dari chest</option>
+              <option value="put">Memasukkan ke chest</option>
+              <option value="chest">Interaksi chest</option>
+              <option value="place">Menaruh block</option>
+              <option value="break">Menghancurkan block</option>
+              <option value="drop">Membuang item</option>
+              <option value="swap">Menukar item</option>
+              <option value="pickup">Mengambil item ground</option>
+              <option value="session">Join / Leave</option>
+              <option value="combat">Combat / Death</option>
+            </select>
+          </div>
+
+          <div id="players-grid" class="players-grid"></div>
+        </article>
+      </section>
+
+      <section id="view-chest" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Chest Activity</h3>
+              <p>Siapa mengambil, memasukkan, menukar item, jumlah, container, dan koordinat jika tersedia.</p>
+            </div>
+            <button id="export-chest" class="btn small" type="button">Export TXT</button>
+          </div>
+
+          <div class="chips">
+            <button class="chip active" data-chest-filter="all" type="button">Semua</button>
+            <button class="chip" data-chest-filter="take" type="button">Mengambil</button>
+            <button class="chip" data-chest-filter="put" type="button">Memasukkan</button>
+            <button class="chip" data-chest-filter="swap" type="button">Menukar</button>
+            <button class="chip" data-chest-filter="valuable" type="button">Barang Mahal</button>
+          </div>
+
+          <div class="toolbar">
+            <input id="chest-keyword" class="input" type="search" placeholder="Cari player, item, container, koordinat..." />
+            <select id="chest-player" class="input select">
+              <option value="all">Semua player</option>
+            </select>
+          </div>
+
+          <div id="chest-table"></div>
+        </article>
+      </section>
+
+      <section id="view-blocks" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Menaruh / Menghancurkan Block</h3>
+              <p>Mining tidak dipakai sebagai label utama. Semua jadi aktivitas block yang jelas.</p>
+            </div>
+            <button id="export-blocks" class="btn small" type="button">Export TXT</button>
+          </div>
+
+          <div class="chips">
+            <button class="chip active" data-block-filter="all" type="button">Semua</button>
+            <button class="chip" data-block-filter="break" type="button">Menghancurkan Block</button>
+            <button class="chip" data-block-filter="place" type="button">Menaruh Block</button>
+            <button class="chip" data-block-filter="ore" type="button">Ore / Valuable</button>
+          </div>
+
+          <div class="toolbar">
+            <input id="block-keyword" class="input" type="search" placeholder="Cari block, ore, player, koordinat..." />
+            <select id="block-player" class="input select">
+              <option value="all">Semua player</option>
+            </select>
+          </div>
+
+          <div id="block-table"></div>
+        </article>
+      </section>
+
+      <section id="view-search" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Search</h3>
+              <p>Search memakai data yang sudah diparsing. Command/chat tetap tersembunyi.</p>
+            </div>
+          </div>
+
+          <div class="search-row">
+            <input id="search-keyword" class="input big" type="search" placeholder="Contoh: diamond chest, Young_Jawa netherite, dirt, koordinat, atau tanggal" />
+            <select id="search-category" class="input select">
+              <option value="all">Semua kategori</option>
+              <option value="take">Mengambil dari chest</option>
+              <option value="put">Memasukkan ke chest</option>
+              <option value="chest">Interaksi chest</option>
+              <option value="place">Menaruh block</option>
+              <option value="break">Menghancurkan block</option>
+              <option value="drop">Membuang item</option>
+              <option value="swap">Menukar item</option>
+              <option value="pickup">Mengambil item ground</option>
+              <option value="session">Join / Leave</option>
+              <option value="combat">Combat / Death</option>
+            </select>
+            <button id="search-btn" class="btn primary" type="button">Search</button>
+          </div>
+
+          <div id="search-table"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div id="player-modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="kicker">Player Detail</p>
+          <h3 id="modal-title">Player Logs</h3>
+        </div>
+        <button id="modal-close" class="icon-btn" type="button" aria-label="Tutup">&times;</button>
+      </div>
+
+      <div id="modal-stats" class="modal-stats"></div>
+
+      <div class="toolbar">
+        <input id="modal-keyword" class="input" type="search" placeholder="Cari di log player ini..." />
+        <select id="modal-category" class="input select">
+          <option value="all">Semua aktivitas</option>
+          <option value="take">Mengambil dari chest</option>
+          <option value="put">Memasukkan ke chest</option>
+          <option value="chest">Interaksi chest</option>
+          <option value="place">Menaruh block</option>
+          <option value="break">Menghancurkan block</option>
+          <option value="drop">Membuang item</option>
+          <option value="swap">Menukar item</option>
+          <option value="pickup">Mengambil item ground</option>
+          <option value="session">Join / Leave</option>
+          <option value="combat">Combat / Death</option>
+        </select>
+      </div>
+
+      <div id="modal-table"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
